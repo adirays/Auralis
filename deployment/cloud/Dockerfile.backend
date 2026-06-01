@@ -1,0 +1,26 @@
+FROM python:3.11-slim AS base
+
+# System deps for OpenCV headless + torch
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 libgl1 libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Python deps first (layer cache)
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/ .
+
+# Copy model weights
+COPY Top_Performance.pt /app/../Top_Performance.pt
+
+# Non-root user for security
+RUN useradd -m -u 1001 auralis && chown -R auralis:auralis /app
+USER auralis
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2", "--log-level", "warning"]

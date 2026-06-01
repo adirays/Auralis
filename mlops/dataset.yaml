@@ -1,0 +1,84 @@
+# Dataset configuration for YOLOv8 multi-class segmentation
+# 
+# Directory structure (YOLO format):
+# dataset/
+#   images/
+#     train/     (image files: *.jpg, *.png)
+#     val/       (image files)
+#     test/      (image files, optional)
+#   labels/
+#     train/     (annotation files: *.txt - one per image)
+#     val/       (annotation files)
+#     test/      (annotation files, optional)
+#
+# Format of .txt files (segmentation):
+#   <class_id> <x1> <y1> <x2> <y2> ... <xN> <yN>
+#   - class_id: 0=crack, 1=spalling, 2=corrosion, 3=delamination, 4=efflorescence
+#   - (x_i, y_i): normalized polygon vertices [0.0, 1.0] in image coordinate system
+#   - one annotation per line
+
+path: /path/to/dataset           # root directory
+
+train: images/train              # training images
+val: images/val                  # validation images
+test: images/test                # test images (optional)
+
+# Number of classes
+nc: 5
+
+# Class names (order matters — must match class_id in annotations)
+names:
+  0: crack              # structural cracks
+  1: spalling           # surface concrete loss
+  2: corrosion          # reinforcement corrosion / rust stains
+  3: delamination       # concrete layer separation
+  4: efflorescence      # salt deposits / white bloom
+
+# ── Dataset Requirements ──────────────────────────────────────────────────
+# 
+# Minimum recommendations for multi-class concrete defects:
+#   - 2000–5000 images per class (total ~10k–25k)
+#   - Geographic diversity (different concrete types, ages, climates)
+#   - Lighting conditions (sunny, cloudy, artificial, night)
+#   - Viewing angles (perpendicular, oblique, extreme)
+#   - Defect sizes (small 1–5%, medium 5–20%, large >20% of image)
+# 
+# Annotation guidelines:
+#   1. Use CVAT, Labelimg (Yolo format), or Roboflow for labeling
+#   2. Polygonal masks > bounding boxes (segmentation captures precise shape)
+#   3. Don't skip unclear defects — label them and let the model learn
+#   4. If a defect touches image edge, include partial mask
+#   5. Overlapping defects: create separate annotation for each class
+# 
+# Class distribution (ideal after augmentation):
+#   - crack:        35–40% (most common in structure monitoring)
+#   - spalling:     20–25%
+#   - corrosion:    15–20% (hardest to detect, may need hard negative mining)
+#   - delamination: 10–15%
+#   - efflorescence: 5–10%
+# 
+# If imbalanced, use YOLO's:
+#   - image_weights=True (forces model to focus on under-represented classes)
+#   - class_weights in training config
+
+# ── Conversion from other formats ─────────────────────────────────────────
+#
+# From COCO JSON (via roboflow or custom script):
+#   https://github.com/ultralytics/ultralytics/blob/main/ultralytics/data/converter.py
+#   
+#   python -c "
+#   from ultralytics.data.converter import coco91_to_coco80_class
+#   from pycocotools.coco import COCO
+#   # Load COCO annotations, convert to YOLO format
+#   "
+#
+# From Polygons (shapefile, GeoJSON):
+#   - Normalize polygon coordinates to [0, 1]
+#   - Write one polygon per line in .txt file
+#   - Format: <class_id> <x1> <y1> <x2> <y2> ... <xN> <yN>
+#
+# From Labelme JSON:
+#   python -m labelme2coco \
+#     --input_dir dataset/train_json \
+#     --output_dir dataset/train_coco
+#   # then convert COCO → YOLO format

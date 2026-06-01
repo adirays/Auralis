@@ -44,3 +44,21 @@ logs/
 *.tmp
 *.bak
 *.swp
+
+# Frontend generated files
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+
+# Backend generated/virtual envs
+backend/.venv/
+backend/__pycache__/
+backend/.cache/
+
+# Large model files (already ignored above but keep explicit)
+*.pt
+*.h5
+*.ckpt
+# Unnecessary project assets
+PRESENTATION.md
+Designs.md

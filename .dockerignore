@@ -1,0 +1,26 @@
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.pytest_cache/
+**/.mypy_cache/
+
+# Node
+**/node_modules/
+Arualisssssss/dist/
+
+# Dev secrets — never bake into image
+backend/.env
+Arualisssssss/.env
+
+# R&D — not needed at runtime
+mlops/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+**/.sixth/
