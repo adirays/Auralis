@@ -49,16 +49,18 @@ logs/
 frontend/node_modules/
 frontend/.next/
 frontend/dist/
+frontend/.vite/
 
 # Backend generated/virtual envs
 backend/.venv/
 backend/__pycache__/
 backend/.cache/
+.pytest_cache/
 
-# Large model files (already ignored above but keep explicit)
-*.pt
-*.h5
-*.ckpt
-# Unnecessary project assets
+# MLflow experiment tracking (local store)
+mlruns/
+mlartifacts/
+
+# Internal working docs
 PRESENTATION.md
 Designs.md

@@ -22,7 +22,7 @@ AI-powered structural defect detection platform. Upload images of concrete struc
 ## Project Structure
 
 ```
-├── Arualisssssss/          # React frontend
+├── frontend/               # React + TypeScript (Vite, Tailwind v4, shadcn/ui)
 ├── backend/                # FastAPI backend
 │   ├── api/                # Route handlers (auth, analysis, history, model)
 │   ├── core/               # Config, database, security
@@ -30,12 +30,12 @@ AI-powered structural defect detection platform. Upload images of concrete struc
 │   ├── services/           # Business logic (analyzer, auth)
 │   └── tests/              # pytest test suite
 ├── mlops/                  # Model training, weights, notebooks
-│   └── README.md           # Weight version history
-├── docker-compose.yml      # Production deployment
-├── Dockerfile.backend
-├── Dockerfile.frontend
-├── nginx.conf              # Reverse proxy + rate limiting
-└── Top_Performance.pt      # Active model weights (production)
+│   ├── src/                # Training scripts
+│   └── notebooks/          # Experiment iterations
+├── deployment/             # Docker & nginx configs
+│   ├── cloud/              # Production Dockerfiles + compose
+│   └── edge/               # Edge deployment configs
+└── nginx.conf              # Reverse proxy + rate limiting
 ```
 
 ---
@@ -81,7 +81,7 @@ API docs: http://localhost:8000/docs
 ### 3. Frontend
 
 ```bash
-cd Arualisssssss
+cd frontend
 npm install
 # Create .env with: VITE_API_URL=http://localhost:8000
 npm run dev
