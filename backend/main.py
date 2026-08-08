@@ -48,6 +48,12 @@ from api.auth.router import router as auth_router
 from api.analysis.router import router as analysis_router
 from api.history.router import router as history_router
 from api.model.router import router as model_router
+from api.diagnostics import router as diagnostics_router
+from api.reports import router as reports_router
+from api.drift import router as drift_router
+from api.calibration import router as calibration_router
+from api.active_learning import router as active_learning_router
+from api.xai_compare import router as xai_compare_router
 
 
 @asynccontextmanager
@@ -100,17 +106,31 @@ async def log_requests(request: Request, call_next):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Log full 422 detail so mismatched fields are visible in the terminal."""
+    errors = exc.errors()
     logger.warning(
         "[422] Validation error on %s %s — %s",
-        request.method, request.url.path, exc.errors(),
+        request.method, request.url.path, errors,
     )
-    return JSONResponse(status_code=422, content={"detail": exc.errors()})
+    # Pydantic v2 errors can contain non-serializable Exception objects in ctx
+    for err in errors:
+        if "ctx" in err and isinstance(err["ctx"], dict):
+            for k, v in list(err["ctx"].items()):
+                if isinstance(v, Exception):
+                    err["ctx"][k] = str(v)
+    return JSONResponse(status_code=422, content={"detail": errors})
+
 
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(analysis_router, prefix="/api")
 app.include_router(history_router, prefix="/api")
 app.include_router(model_router, prefix="/api")
+app.include_router(diagnostics_router, prefix="/api")
+app.include_router(reports_router, prefix="/api")
+app.include_router(drift_router, prefix="/api")
+app.include_router(calibration_router, prefix="/api")
+app.include_router(active_learning_router, prefix="/api")
+app.include_router(xai_compare_router, prefix="/api")
 
 
 @app.get("/health")
