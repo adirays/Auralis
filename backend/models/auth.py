@@ -2,6 +2,18 @@ from pydantic import BaseModel, EmailStr, field_validator
 from typing import Literal
 import re
 
+_PASSWORD_REGEX = re.compile(r"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$")
+_PASSWORD_ERROR = (
+    "Password must be at least 8 characters and include uppercase, number, and special character"
+)
+
+
+def _validate_password(v: str) -> str:
+    """Shared password strength validator used by signup and password-reset models."""
+    if not _PASSWORD_REGEX.match(v):
+        raise ValueError(_PASSWORD_ERROR)
+    return v
+
 
 class SignupRequest(BaseModel):
     name: str
@@ -21,11 +33,7 @@ class SignupRequest(BaseModel):
     @field_validator("password")
     @classmethod
     def password_strength(cls, v: str) -> str:
-        if not re.match(r"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$", v):
-            raise ValueError(
-                "Password must be at least 8 characters and include uppercase, number, and special character"
-            )
-        return v
+        return _validate_password(v)
 
     @field_validator("organization")
     @classmethod
@@ -53,11 +61,7 @@ class PasswordResetConfirm(BaseModel):
     @field_validator("new_password")
     @classmethod
     def password_strength(cls, v: str) -> str:
-        if not re.match(r"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$", v):
-            raise ValueError(
-                "Password must be at least 8 characters and include uppercase, number, and special character"
-            )
-        return v
+        return _validate_password(v)
 
 
 class TokenResponse(BaseModel):

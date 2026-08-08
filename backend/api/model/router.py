@@ -15,3 +15,15 @@ async def model_info():
         "explainability":       "EigenCAM (Layer 4 \u00d7 Layer 9 SVD Fusion)",
         "task":                 "Instance Segmentation \u2014 crack",
     }
+
+
+@router.get("/eigencam/config")
+async def eigencam_config():
+    """Returns technical details of the SVD Layer Fusion."""
+    return {
+        "fused_layers": [4, 9],
+        "weights": {"layer_4": 0.6, "layer_9": 0.4},
+        "colormap": "TURBO",
+        "background_threshold": 0.02,
+        "normalization": "Pre-masking min-max normalization",
+    }
