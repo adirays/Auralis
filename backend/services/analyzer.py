@@ -83,17 +83,10 @@ class FusionCAMHook:
 
 
 def _compute_eigen_cam(activations: torch.Tensor) -> np.ndarray:
-    """
-    SVD-based EigenCAM on a (1, C, H, W) activation tensor.
-    Matches mlops/src/eigen_cam.py :: compute_eigen_cam() exactly.
-    """
-    b, c, height, width = activations.size()
-    A = activations.squeeze(0).view(c, height * width)
-    A = A - A.mean(dim=1, keepdim=True)
-    U, S, V = torch.linalg.svd(A, full_matrices=False)
-    cam = torch.matmul(U[:, 0], A).view(height, width)
-    cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
-    return cam.numpy()
+    """Delegate to the canonical implementation in xai_methods."""
+    from services.xai_methods import eigencam
+    return eigencam(activations, normalize=True)
+
 
 
 def _get_model():
